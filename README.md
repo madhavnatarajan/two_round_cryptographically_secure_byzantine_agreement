@@ -1,4 +1,4 @@
-# IBADomExt: 2-Round Byzantine Agreement Demo
+# Round-Optimal Domain Extension for Cryptographically Secure Byzantine Agreement Demo
 
 An interactive demo of the cryptographically secure domain extension protocol for Byzantine Agreement, implemented in Rust with a browser-based UI.
 
