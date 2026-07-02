@@ -28,7 +28,7 @@ Then open `index.html` directly in your browser. The UI connects to the server a
 
 ## Paper
 
-This demo is based on the research paper **"Cryptographically Secure Domain Extension for Byzantine Agreement with Improved Round Complexity"**, to be published at [ACM PODC 2026](https://www.podc.org/).
+This demo is based on the research paper **"Cryptographically Secure Domain Extension for Byzantine Agreement with Improved Round Complexity"**, published at [ACM PODC 2026](https://www.podc.org/).
 
 > 📄 [Read the full paper](https://dl.acm.org/doi/10.1145/3796701.3815921)
 
