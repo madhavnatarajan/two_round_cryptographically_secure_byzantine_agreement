@@ -9,7 +9,7 @@ The protocol runs in 2 rounds across `n` nodes, tolerating up to `t` faulty node
 - **Round 1:** Each honest node Reed-Solomon encodes its input, builds a Merkle tree over the shards, and broadcasts its Merkle root to a BB oracle (whiteboard). The system identifies a `CORE` set of `n-t` nodes that agree on the same root.
 - **Round 2:** Non-CORE nodes collect shards from CORE members, verify each shard against the agreed Merkle root, and reconstruct the original message from any `t+1` valid components. Corrupted data from liars is detected and rejected via Merkle proof verification.
 
-Node behaviors can be set to **Honest**, **Mute** (silent), or **Liar** (sends corrupted shards).
+Each node has its own configurable input message and behavior. If honest nodes share the same input, a CORE forms and the message is reconstructed. If they differ, no CORE can form and the protocol outputs **⊥**. Node behaviors can be set to **Honest**, **Mute** (silent), or **Liar** (sends corrupted shards).
 
 ## Running
 

@@ -19,11 +19,11 @@
             const [error, setError] = React.useState(null);
             const [loading, setLoading] = React.useState(false);
 
-            // New state for the configuration form
+            const DEFAULT_MSG = "Live-Demo-Works!";
             const [config, setConfig] = React.useState({
                 n: 7,
                 t: 3,
-                inputString: "Live-Demo-Works!",
+                inputStrings: Array(7).fill(DEFAULT_MSG),
                 nodeBehaviors: Array(7).fill('Honest'),
             });
 
@@ -71,7 +71,6 @@
                     if (!response.ok) {
                         throw new Error(`Server rejected config (Status: ${response.status}). Check console.`);
                     }
-                    // On success, initialize the view state
                     setState({ n: config.n, t: config.t, node_behaviors: config.nodeBehaviors, round1_complete: false, round2_complete: false });
                 } catch (err) {
                     console.error("API Error:", err);
@@ -118,19 +117,16 @@
                 );
             };
 
-            // Handler for config changes
             const handleConfigChange = (e) => {
                 const { name, value } = e.target;
                 let newConfig = { ...config, [name]: value };
-
                 if (name === 'n') {
                     const nValue = parseInt(value, 10) || 0;
                     newConfig.n = nValue;
                     newConfig.nodeBehaviors = Array(nValue).fill('Honest');
+                    newConfig.inputStrings = Array(nValue).fill(DEFAULT_MSG);
                 }
-                if (name === 't') {
-                    newConfig.t = parseInt(value, 10) || 0;
-                }
+                if (name === 't') newConfig.t = parseInt(value, 10) || 0;
                 setConfig(newConfig);
             };
 
@@ -138,6 +134,12 @@
                 const newBehaviors = [...config.nodeBehaviors];
                 newBehaviors[index] = behavior;
                 setConfig({ ...config, nodeBehaviors: newBehaviors });
+            };
+
+            const handleNodeInputChange = (index, value) => {
+                const newInputs = [...config.inputStrings];
+                newInputs[index] = value;
+                setConfig({ ...config, inputStrings: newInputs });
             };
 
             return (
@@ -152,7 +154,7 @@
                     {/* --- Configuration Panel --- */}
                     <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 shadow-lg mb-8">
                         <h2 className="text-2xl font-bold text-cyan-400 mb-4">1. Configure Simulation</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label htmlFor="n" className="block text-sm font-medium text-slate-300">Total Nodes (n)</label>
                                 <input type="number" name="n" id="n" value={config.n} onChange={handleConfigChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
@@ -161,22 +163,19 @@
                                 <label htmlFor="t" className="block text-sm font-medium text-slate-300">Faulty Nodes (t)</label>
                                 <input type="number" name="t" id="t" value={config.t} onChange={handleConfigChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
                             </div>
-                            <div>
-                                <label htmlFor="inputString" className="block text-sm font-medium text-slate-300">Input Message</label>
-                                <input type="text" name="inputString" id="inputString" value={config.inputString} onChange={handleConfigChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
-                            </div>
                         </div>
                         <div className="mb-6">
-                            <h3 className="text-lg font-medium text-slate-300 mb-2">Node Behaviors</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                            <h3 className="text-lg font-medium text-slate-300 mb-2">Node Configuration</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {config.nodeBehaviors.map((behavior, i) => (
-                                    <div key={i}>
-                                        <label htmlFor={`node-${i}`} className="block text-sm font-medium text-slate-400">Node P{i}</label>
-                                        <select id={`node-${i}`} value={behavior} onChange={(e) => handleNodeBehaviorChange(i, e.target.value)} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm">
+                                    <div key={i} className="bg-slate-700/50 p-3 rounded-lg border border-slate-600">
+                                        <div className="font-bold text-slate-300 mb-2">Node P{i}</div>
+                                        <select value={behavior} onChange={(e) => handleNodeBehaviorChange(i, e.target.value)} className="mb-2 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm">
                                             <option>Honest</option>
                                             <option>Mute</option>
                                             <option>Liar</option>
                                         </select>
+                                        <input type="text" value={config.inputStrings[i]} onChange={(e) => handleNodeInputChange(i, e.target.value)} placeholder="Input message" className="block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm font-mono" />
                                     </div>
                                 ))}
                             </div>
@@ -241,9 +240,14 @@
                             {state.round2_complete && <>
                                 <h3 className="text-xl font-bold text-green-400 mb-2">Final Reconstructed Output</h3>
                                 <p className="text-slate-400 mb-4">After collecting `t+1` valid components, a non-CORE node successfully reconstructs the original message.</p>
-                                <div className="bg-black/50 p-4 rounded font-mono text-green-300 break-all border border-green-500/30 text-lg">
+                                <div className={`bg-black/50 p-4 rounded font-mono break-all border text-lg ${
+                                    state.recovered_message === '⊥'
+                                        ? 'text-yellow-300 border-yellow-500/30'
+                                        : 'text-green-300 border-green-500/30'
+                                }`}>
                                     {state.recovered_message}
                                 </div>
+                                {state.recovered_message === '⊥' && <p className="text-yellow-400 text-sm mt-2">No CORE set could be formed — honest nodes did not share a common input, so the protocol outputs ⊥.</p>}
                             </>}
                         </div>}
                     </div>

@@ -156,6 +156,11 @@ impl Simulation {
             .map(|n| n.id)
             .unwrap_or(0); // Default to 0 if all honest nodes are in CORE
 
+        if core_set.is_empty() {
+            println!("❌ No CORE set formed — nodes have differing inputs. Outputting ⊥.");
+            return (false, "⊥".to_string());
+        }
+
         let agreed_root = oracle_whiteboard[core_set[0]].unwrap();
         let mut collected_shards: Vec<Option<Vec<u8>>> = vec![None; self.n];
         let mut verified_count = 0;
@@ -275,8 +280,8 @@ async fn get_status(State(state): State<SharedState>) -> Json<AppState> {
 struct StartPayload {
     n: usize,
     t: usize,
-    #[serde(rename = "inputString")]
-    input_string: String,
+    #[serde(rename = "inputStrings")]
+    input_strings: Vec<String>,
     #[serde(rename = "nodeBehaviors")]
     node_behaviors: Vec<Behavior>,
 }
@@ -299,12 +304,13 @@ async fn start_simulation(
         return StatusCode::BAD_REQUEST;
     }
 
-    println!("Received config: n={}, t={}, input='{}'", payload.n, payload.t, payload.input_string);
+    println!("Received config: n={}, t={}, inputs={:?}", payload.n, payload.t, payload.input_strings);
 
     let mut nodes = Vec::new();
     for (i, behavior) in payload.node_behaviors.iter().enumerate() {
         println!("  - Node P{} behavior: {:?}", i, behavior);
-        nodes.push(Node { id: i, input: payload.input_string.as_bytes().to_vec(), behavior: behavior.clone() });
+        let input = payload.input_strings.get(i).cloned().unwrap_or_default();
+        nodes.push(Node { id: i, input: input.into_bytes(), behavior: behavior.clone() });
     }
 
     let mut state_guard = state.lock().unwrap();
