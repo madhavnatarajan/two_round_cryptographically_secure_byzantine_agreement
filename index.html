@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBADomExt 2-Round Protocol Showcase</title>
+    <!-- Using a CDN for simplicity in this single-file setup -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-900 text-white p-8 font-sans">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function Dashboard() {
+            const [state, setState] = React.useState(null);
+            const [error, setError] = React.useState(null);
+            const [loading, setLoading] = React.useState(false);
+
+            // New state for the configuration form
+            const [config, setConfig] = React.useState({
+                n: 7,
+                t: 3,
+                inputString: "Live-Demo-Works!",
+                nodeBehaviors: Array(7).fill('Honest'),
+            });
+
+            const API_BASE = "http://127.0.0.1:3000";
+
+            const handleApiCall = async (endpoint, method = 'POST') => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch(`${API_BASE}/${endpoint}`, { method });
+                    if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
+                    const data = await response.json();
+                    setState(prevState => ({ ...prevState, ...data }));
+                } catch (err) {
+                    console.error("API Error:", err);
+                    setError("Could not connect to the simulation server. Is 'cargo run' active?");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const startSimulation = async () => {
+                setLoading(true);
+                setError(null); // Clear previous errors
+                setState(null); // Clear previous simulation view
+
+                if (config.n <= 2 * config.t) {
+                    setError(`Invalid Configuration: n must be greater than 2*t (n > ${2*config.t})`);
+                    setLoading(false);
+                    return;
+                }
+
+                if (config.n > 256) {
+                    setError(`Invalid Configuration: n must be less than or equal to 256.`);
+                    setLoading(false);
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/start`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(config)
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Server rejected config (Status: ${response.status}). Check console.`);
+                    }
+                    // On success, initialize the view state
+                    setState({ n: config.n, t: config.t, node_behaviors: config.nodeBehaviors, round1_complete: false, round2_complete: false });
+                } catch (err) {
+                    console.error("API Error:", err);
+                    setError("Could not connect to the simulation server. Is 'cargo run' active?");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const NodeCard = ({ i, root, config }) => {
+                const isCore = state?.core_set?.includes(i);
+                const isMute = root === null;
+                const behavior = state?.node_behaviors?.[i] || config?.nodeBehaviors[i];
+                const isLiar = behavior === 'Liar';
+                const isHonest = behavior === 'Honest';
+
+                let statusColor = 'bg-slate-800/50 border-slate-700';
+                if (state?.round1_complete) {
+                    statusColor = isCore ? 'bg-blue-500/20 border-blue-500' : 'bg-slate-800/60 border-slate-700 opacity-50';
+                }
+
+                let statusText = isCore ? 'CORE' : 'Non-CORE';
+                let behaviorText = isHonest ? 'Honest' : (isLiar ? 'Liar' : 'Mute');
+
+                return (
+                    <div key={i} className={`p-4 rounded-lg border ${statusColor} transition-all duration-500`}>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="font-bold text-lg">Node P{i}</span>
+                            {behavior && <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                isHonest ? 'bg-green-500/20 text-green-300' : 
+                                isLiar ? 'bg-red-500/20 text-red-300' : 'bg-gray-500/20 text-gray-400'
+                            }`}>
+                                {behaviorText}
+                            </span>}
+                        </div>
+                        <div className="font-mono text-sm break-all">
+                            {root !== undefined && (isMute
+                                ? <span className="text-red-400">▶ MUTE (No Root)</span>
+                                : <span className="text-slate-300">▶ <span className="text-green-400">{root}</span></span>)
+                            }
+                        </div>
+                         {isCore !== undefined && <div className="text-right text-xs font-bold text-blue-400 mt-2 opacity-70">{statusText}</div>}
+                    </div>
+                );
+            };
+
+            // Handler for config changes
+            const handleConfigChange = (e) => {
+                const { name, value } = e.target;
+                let newConfig = { ...config, [name]: value };
+
+                if (name === 'n') {
+                    const nValue = parseInt(value, 10) || 0;
+                    newConfig.n = nValue;
+                    newConfig.nodeBehaviors = Array(nValue).fill('Honest');
+                }
+                if (name === 't') {
+                    newConfig.t = parseInt(value, 10) || 0;
+                }
+                setConfig(newConfig);
+            };
+
+            const handleNodeBehaviorChange = (index, behavior) => {
+                const newBehaviors = [...config.nodeBehaviors];
+                newBehaviors[index] = behavior;
+                setConfig({ ...config, nodeBehaviors: newBehaviors });
+            };
+
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <header className="mb-6 border-b border-slate-700 pb-4">
+                        <h1 className="text-4xl font-bold text-blue-400">IBADomExt: 2-Round Protocol Showcase</h1>
+                        <p className="text-slate-400 mt-2">
+                            A demonstration of the protocol from "Cryptographically Secure Domain Extension for Byzantine Agreement with Improved Round Complexity".
+                        </p>
+                    </header>
+
+                    {/* --- Configuration Panel --- */}
+                    <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 shadow-lg mb-8">
+                        <h2 className="text-2xl font-bold text-cyan-400 mb-4">1. Configure Simulation</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label htmlFor="n" className="block text-sm font-medium text-slate-300">Total Nodes (n)</label>
+                                <input type="number" name="n" id="n" value={config.n} onChange={handleConfigChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
+                            </div>
+                            <div>
+                                <label htmlFor="t" className="block text-sm font-medium text-slate-300">Faulty Nodes (t)</label>
+                                <input type="number" name="t" id="t" value={config.t} onChange={handleConfigChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
+                            </div>
+                            <div>
+                                <label htmlFor="inputString" className="block text-sm font-medium text-slate-300">Input Message</label>
+                                <input type="text" name="inputString" id="inputString" value={config.inputString} onChange={handleConfigChange} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
+                            </div>
+                        </div>
+                        <div className="mb-6">
+                            <h3 className="text-lg font-medium text-slate-300 mb-2">Node Behaviors</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                                {config.nodeBehaviors.map((behavior, i) => (
+                                    <div key={i}>
+                                        <label htmlFor={`node-${i}`} className="block text-sm font-medium text-slate-400">Node P{i}</label>
+                                        <select id={`node-${i}`} value={behavior} onChange={(e) => handleNodeBehaviorChange(i, e.target.value)} className="mt-1 block w-full rounded-md bg-slate-700 border-slate-600 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm">
+                                            <option>Honest</option>
+                                            <option>Mute</option>
+                                            <option>Liar</option>
+                                        </select>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <button onClick={startSimulation} disabled={loading} className="bg-green-600 hover:bg-green-500 disabled:bg-slate-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                                {loading ? 'Starting...' : 'Start / Reset Simulation'}
+                            </button>
+                            {config.n <= 2 * config.t && <div className="text-red-400 font-bold text-sm bg-red-900/50 px-3 py-2 rounded">
+                                Condition <span className="font-mono">n &gt; 2t</span> not met. Protocol is not guaranteed to succeed.
+                            </div>}
+                        </div>
+                    </div>
+
+                    {/* --- Simulation Controls & Status --- */}
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 shadow-lg mb-8 flex items-center justify-between gap-4">
+                        <div className="flex gap-4">
+                            <button onClick={() => handleApiCall('round1')} disabled={loading || !state || state.round1_complete} className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                                {loading && state && !state.round1_complete ? 'Running...' : '2. Run Round 1'}
+                            </button>
+                            <button onClick={() => handleApiCall('round2')} disabled={loading || !state?.round1_complete || state.round2_complete} className="bg-purple-600 hover:bg-purple-500 disabled:bg-slate-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                                {loading && state?.round1_complete ? 'Running...' : '3. Run Round 2'}
+                            </button>
+                        </div>
+                        {error && <div className="text-red-400 font-bold text-sm bg-red-900/50 px-3 py-2 rounded">{error}</div>}
+                    </div>
+
+                    {!state && <div className="text-center text-slate-400 p-8">Configure and start a simulation to begin.</div>}
+
+                    <div className="space-y-8">
+                        {/* Round 1 Output */}
+                        {state && <div className={`bg-slate-800/50 p-6 rounded-xl border border-slate-700 shadow-lg transition-opacity duration-500 ${state.round1_complete ? 'opacity-100' : 'opacity-50'}`}>
+                            <h2 className="text-2xl font-bold text-emerald-400 mb-4">Round 1: BB Oracle Whiteboard</h2>
+                            <p className="text-slate-400 mb-6">Each node generates a Merkle Root and broadcasts it. The system identifies a `CORE` set of `n-t` nodes that agree on a root.</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[12rem]">
+                                {state.whiteboard ? state.whiteboard.map((root, i) => <NodeCard key={i} i={i} root={root} config={config} />)
+                                : Array.from({length: state.n || 0}).map((_, i) => <NodeCard key={i} i={i} config={config} />)
+                                }
+                            </div>
+                            {state.core_set && <div className="mt-6">
+                                <h3 className="text-lg font-bold text-blue-300 mb-2">Identified CORE Set:</h3>
+                                <div className="flex gap-2 flex-wrap">
+                                    {state.core_set.map(id => (
+                                        <span key={id} className="bg-blue-600 px-3 py-1 rounded-full text-sm font-bold animate-pulse">P{id}</span>
+                                    ))}
+                                </div>
+                            </div>}
+                        </div>}
+                        
+                        {/* Round 2 Output */}
+                        {state?.round1_complete && <div className={`bg-slate-800/50 p-6 rounded-xl border border-slate-700 shadow-lg transition-opacity duration-500 ${state.round2_complete ? 'opacity-100' : 'opacity-50'}`}>
+                            <h2 className="text-2xl font-bold text-purple-400 mb-4">Round 2: Verification & Reconstruction</h2>
+                            <p className="text-slate-400 mb-6">Non-CORE nodes verify and collect components from CORE members to reconstruct the original message.</p>
+                            
+                             {state.round2_complete && state.liar_caught && (
+                                <div className="bg-red-500/20 border border-red-500 text-red-200 p-3 rounded mb-4 text-sm flex items-center gap-3 animate-pulse">
+                                    <span className="text-xl">🚨</span>
+                                    <div><strong>LIAR DETECTED:</strong> A non-CORE node received a corrupted component from P6. It was rejected because its Merkle proof did not match the agreed CORE root.</div>
+                                </div>
+                            )}
+                            
+                            {state.round2_complete && <>
+                                <h3 className="text-xl font-bold text-green-400 mb-2">Final Reconstructed Output</h3>
+                                <p className="text-slate-400 mb-4">After collecting `t+1` valid components, a non-CORE node successfully reconstructs the original message.</p>
+                                <div className="bg-black/50 p-4 rounded font-mono text-green-300 break-all border border-green-500/30 text-lg">
+                                    {state.recovered_message}
+                                </div>
+                            </>}
+                        </div>}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Dashboard />);
+    </script>
+</body>
+</html>

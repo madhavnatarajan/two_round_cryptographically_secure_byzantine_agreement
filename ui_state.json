@@ -1,0 +1,23 @@
+{
+  "core_set": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    6
+  ],
+  "liar_caught": true,
+  "n": 7,
+  "recovered_message": "PODC2026-Showcase-Demo!!",
+  "t": 3,
+  "whiteboard": [
+    "0x20433526",
+    "0x20433526",
+    "0x20433526",
+    "0x20433526",
+    "0x20433526",
+    null,
+    "0x20433526"
+  ]
+}
