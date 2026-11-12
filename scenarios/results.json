@@ -1,0 +1,598 @@
+[
+  {
+    "scenario": "all_honest_same_input",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 4,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 5,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 6,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "all_honest_different_inputs",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest"
+    ],
+    "node_inputs": [
+      "aaa",
+      "bbb",
+      "ccc",
+      "ddd",
+      "eee",
+      "fff",
+      "ggg"
+    ],
+    "core_set": [],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 4,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 5,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 6,
+        "message": "⊥",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "majority_same_minority_different",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "other",
+      "other"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 4,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 5,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 6,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "exactly_t_mutes",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Mute",
+      "Mute",
+      "Mute"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "more_than_t_mutes",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Mute",
+      "Mute",
+      "Mute",
+      "Mute"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "⊥",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "⊥",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "exactly_t_liars",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Liar",
+      "Liar",
+      "Liar"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "liars_inside_core",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Liar",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "node_outputs": [
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 4,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 5,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 6,
+        "message": "hello",
+        "liar_caught": true
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "minimum_valid_config",
+    "n": 5,
+    "t": 2,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 4,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "minimum_config_with_t_faults",
+    "n": 5,
+    "t": 2,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Liar",
+      "Liar"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  },
+  {
+    "scenario": "mixed_mute_and_liar",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Mute",
+      "Liar",
+      "Liar"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "hello"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6
+    ],
+    "node_outputs": [
+      {
+        "node_id": 0,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 1,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 2,
+        "message": "hello",
+        "liar_caught": false
+      },
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": false
+      }
+    ],
+    "agreement": true,
+    "validity": true,
+    "termination": true,
+    "overall": true
+  }
+]
