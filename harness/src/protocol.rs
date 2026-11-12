@@ -85,9 +85,10 @@ impl Simulation {
         let mut round2_broadcasts: Vec<VerifiedShard> = Vec::new();
         let mut liar_flags: Vec<bool> = vec![false; self.n];
 
+        // Honest nodes: scan ALL CORE senders, flag any invalid, relay first valid.
         for node in self.nodes.iter().filter(|n| n.behavior == Behavior::Honest) {
             let j = node.id;
-            // Find the first valid shard j sent by a CORE member to node j.
+            let mut relay: Option<VerifiedShard> = None;
             for msg in all_p2p_messages {
                 if msg.receiver_id != j { continue; }
                 if msg.component_index != j { continue; }
@@ -99,16 +100,34 @@ impl Simulation {
                 let proof = rs_merkle::MerkleProof::<Sha256>::new(msg.proof.clone());
 
                 if proof.verify(agreed_root, &[j], &[leaf_hash], self.n) {
-                    round2_broadcasts.push(VerifiedShard {
-                        node_id: j,
-                        component_index: j,
-                        component: msg.component.clone(),
-                        proof: msg.proof.clone(),
-                    });
-                    break;
+                    if relay.is_none() {
+                        relay = Some(VerifiedShard {
+                            node_id: j,
+                            component_index: j,
+                            component: msg.component.clone(),
+                            proof: msg.proof.clone(),
+                        });
+                    }
                 } else {
                     liar_flags[msg.sender_id] = true;
                 }
+            }
+            if let Some(vs) = relay { round2_broadcasts.push(vs); }
+        }
+
+        // Liar nodes also relay in Round 2 — they send their (corrupted) shard.
+        // Reconstruction verifies each relayed shard, so these get rejected.
+        for node in self.nodes.iter().filter(|n| n.behavior == Behavior::Liar) {
+            let j = node.id;
+            if let Some(msg) = all_p2p_messages.iter().find(|m| {
+                m.sender_id == j && m.receiver_id == j && m.component_index == j
+            }) {
+                round2_broadcasts.push(VerifiedShard {
+                    node_id: j,
+                    component_index: j,
+                    component: msg.component.clone(),
+                    proof: msg.proof.clone(),
+                });
             }
         }
 

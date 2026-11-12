@@ -1,5 +1,5 @@
 use harness::adversary::{Behavior, Node};
-use harness::grader::{grade, RunResult};
+use harness::grader::{grade, GradeStatus, RunResult};
 use harness::protocol::Simulation;
 use serde::Serialize;
 use std::fs;
@@ -12,6 +12,14 @@ struct NodeOutputRecord {
 }
 
 #[derive(Serialize)]
+struct Verdict {
+    status: String,
+    agreement: Option<bool>,
+    validity: Option<bool>,
+    termination: Option<bool>,
+}
+
+#[derive(Serialize)]
 struct ScenarioResult {
     scenario: &'static str,
     n: usize,
@@ -20,10 +28,7 @@ struct ScenarioResult {
     node_inputs: Vec<String>,
     core_set: Vec<usize>,
     node_outputs: Vec<NodeOutputRecord>,
-    agreement: bool,
-    validity: bool,
-    termination: bool,
-    overall: bool,
+    verdict: Verdict,
 }
 
 fn run_scenario(
@@ -43,11 +48,15 @@ fn run_scenario(
     let (core_set, whiteboard, all_msgs) = sim.run_round_1();
     let outputs = sim.run_round_2(core_set.clone(), &whiteboard, &all_msgs);
 
-    let result = RunResult { nodes, core_set: core_set.clone(), outputs };
+    let result = RunResult { nodes, n, t, core_set: core_set.clone(), outputs };
     let verdict = grade(&result);
 
-    println!("[{}] overall={} agreement={} validity={} termination={}",
-        scenario, verdict.overall, verdict.agreement, verdict.validity, verdict.termination);
+    let status_str = match verdict.status {
+        GradeStatus::Pass => "pass",
+        GradeStatus::Fail => "fail",
+        GradeStatus::OutsideModel => "outside_model",
+    };
+    println!("[{}] {}", scenario, status_str);
 
     let node_outputs = result.outputs.iter().map(|o| NodeOutputRecord {
         node_id: o.node_id,
@@ -61,10 +70,12 @@ fn run_scenario(
         node_inputs: inputs.iter().map(|s| s.to_string()).collect(),
         core_set,
         node_outputs,
-        agreement: verdict.agreement,
-        validity: verdict.validity,
-        termination: verdict.termination,
-        overall: verdict.overall,
+        verdict: Verdict {
+            status: status_str.to_string(),
+            agreement: verdict.agreement,
+            validity: verdict.validity,
+            termination: verdict.termination,
+        },
     }
 }
 

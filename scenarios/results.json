@@ -67,10 +67,12 @@
         "liar_caught": false
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "all_honest_different_inputs",
@@ -132,10 +134,12 @@
         "liar_caught": false
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "majority_same_minority_different",
@@ -203,10 +207,12 @@
         "liar_caught": false
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "exactly_t_mutes",
@@ -258,10 +264,12 @@
         "liar_caught": false
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "more_than_t_mutes",
@@ -303,10 +311,12 @@
         "liar_caught": false
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "outside_model",
+      "agreement": null,
+      "validity": null,
+      "termination": null
+    }
   },
   {
     "scenario": "exactly_t_liars",
@@ -343,28 +353,30 @@
       {
         "node_id": 0,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 1,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 2,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 3,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "liars_inside_core",
@@ -429,10 +441,12 @@
         "liar_caught": true
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "minimum_valid_config",
@@ -486,10 +500,12 @@
         "liar_caught": false
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "minimum_config_with_t_faults",
@@ -520,23 +536,25 @@
       {
         "node_id": 0,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 1,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 2,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   },
   {
     "scenario": "mixed_mute_and_liar",
@@ -572,27 +590,29 @@
       {
         "node_id": 0,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 1,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 2,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       },
       {
         "node_id": 3,
         "message": "hello",
-        "liar_caught": false
+        "liar_caught": true
       }
     ],
-    "agreement": true,
-    "validity": true,
-    "termination": true,
-    "overall": true
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true
+    }
   }
 ]
