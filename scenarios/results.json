@@ -71,7 +71,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -138,7 +139,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -211,7 +213,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -268,7 +271,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -315,7 +319,8 @@
       "status": "outside_model",
       "agreement": null,
       "validity": null,
-      "termination": null
+      "termination": null,
+      "protocol_conformance": null
     }
   },
   {
@@ -375,7 +380,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -445,7 +451,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -504,7 +511,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -553,7 +561,8 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
     }
   },
   {
@@ -612,7 +621,66 @@
       "status": "pass",
       "agreement": true,
       "validity": true,
-      "termination": true
+      "termination": true,
+      "protocol_conformance": true
+    }
+  },
+  {
+    "scenario": "worst_case_consistency",
+    "n": 7,
+    "t": 3,
+    "node_behaviors": [
+      "Liar",
+      "Liar",
+      "Liar",
+      "Honest",
+      "Honest",
+      "Honest",
+      "Honest"
+    ],
+    "node_inputs": [
+      "hello",
+      "hello",
+      "hello",
+      "hello",
+      "other1",
+      "other2",
+      "other3"
+    ],
+    "core_set": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node_outputs": [
+      {
+        "node_id": 3,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 4,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 5,
+        "message": "hello",
+        "liar_caught": true
+      },
+      {
+        "node_id": 6,
+        "message": "hello",
+        "liar_caught": true
+      }
+    ],
+    "verdict": {
+      "status": "pass",
+      "agreement": true,
+      "validity": true,
+      "termination": true,
+      "protocol_conformance": true
     }
   }
 ]

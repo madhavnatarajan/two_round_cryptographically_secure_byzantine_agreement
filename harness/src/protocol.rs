@@ -150,6 +150,8 @@ impl Simulation {
                 if proof.verify(agreed_root, &[vs.component_index], &[leaf_hash], self.n) {
                     collected_shards[vs.component_index] = Some(vs.component.clone());
                     verified_count += 1;
+                } else {
+                    liar_flags[vs.node_id] = true;
                 }
             }
 

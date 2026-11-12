@@ -17,6 +17,7 @@ struct Verdict {
     agreement: Option<bool>,
     validity: Option<bool>,
     termination: Option<bool>,
+    protocol_conformance: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -75,6 +76,7 @@ fn run_scenario(
             agreement: verdict.agreement,
             validity: verdict.validity,
             termination: verdict.termination,
+            protocol_conformance: verdict.protocol_conformance,
         },
     }
 }
@@ -146,6 +148,13 @@ fn main() {
         vec!["hello", "hello", "hello", "hello", "hello", "hello", "hello"],
         vec![Behavior::Honest, Behavior::Honest, Behavior::Honest, Behavior::Honest,
              Behavior::Mute, Behavior::Liar, Behavior::Liar],
+    ));
+
+    // 11. Worst-case: t liars P0-P2 in CORE, P3 honest in CORE, P4-P6 honest with different inputs
+    results.push(run_scenario("worst_case_consistency", 7, 3,
+        vec!["hello", "hello", "hello", "hello", "other1", "other2", "other3"],
+        vec![Behavior::Liar, Behavior::Liar, Behavior::Liar, Behavior::Honest,
+             Behavior::Honest, Behavior::Honest, Behavior::Honest],
     ));
 
     let json = serde_json::to_string_pretty(&results).unwrap();

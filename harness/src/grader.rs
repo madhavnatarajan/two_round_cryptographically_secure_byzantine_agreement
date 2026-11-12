@@ -24,6 +24,8 @@ pub struct Verdict {
     pub agreement: Option<bool>,
     pub validity: Option<bool>,
     pub termination: Option<bool>,
+    /// Protocol-specific: ⊥ iff no CORE formed. Separate from BA validity.
+    pub protocol_conformance: Option<bool>,
 }
 
 pub fn grade(result: &RunResult) -> Verdict {
@@ -31,11 +33,11 @@ pub fn grade(result: &RunResult) -> Verdict {
         .filter(|n| n.behavior != Behavior::Honest)
         .count();
 
-    // Protocol makes no guarantees outside the fault bound.
     if faulty_count > result.t {
         return Verdict {
             status: GradeStatus::OutsideModel,
             agreement: None, validity: None, termination: None,
+            protocol_conformance: None,
         };
     }
 
@@ -53,33 +55,23 @@ pub fn grade(result: &RunResult) -> Verdict {
 
     let agreement = honest_outputs.windows(2).all(|w| w[0] == w[1]);
 
+    // BA validity: if all honest inputs are equal, output must equal that value.
+    // When honest inputs differ, BA validity is vacuous.
     let honest_inputs: Vec<&Vec<u8>> = honest_nodes.iter().map(|n| &n.input).collect();
     let all_same_input = honest_inputs.windows(2).all(|w| w[0] == w[1]);
-
-    let validity = if !all_same_input {
-        // Inputs differ among honest nodes. A CORE may still have formed around
-        // a subset's common value. Valid outputs are: the CORE's agreed value,
-        // or ⊥ if no CORE formed.
-        if result.core_set.is_empty() {
-            honest_outputs.iter().all(|o| *o == "⊥")
-        } else {
-            // Find the common input of CORE members (they must all be honest with same input
-            // for a CORE to form; if a liar is in CORE it broadcast the honest root).
-            // The agreed output is whatever honest nodes reconstructed — check all agree.
-            honest_outputs.windows(2).all(|w| w[0] == w[1]) && !honest_outputs.iter().any(|o| *o == "⊥")
-        }
-    } else {
+    let validity = if all_same_input {
         let expected = String::from_utf8_lossy(honest_inputs[0])
             .trim_matches(char::from(0))
             .to_string();
-        if result.core_set.is_empty() {
-            // No CORE formed within fault bound — ⊥ is acceptable.
-            honest_outputs.iter().all(|o| *o == "⊥")
-        } else {
-            // CORE formed — output must equal the common input.
-            honest_outputs.iter().all(|o| *o == expected)
-        }
+        honest_outputs.iter().all(|o| *o == expected)
+    } else {
+        true
     };
+
+    // Protocol conformance: ⊥ output iff no CORE formed.
+    let all_bot = honest_outputs.iter().all(|o| *o == "⊥");
+    let none_bot = honest_outputs.iter().all(|o| *o != "⊥");
+    let protocol_conformance = if result.core_set.is_empty() { all_bot } else { none_bot };
 
     let overall = agreement && validity && termination;
     Verdict {
@@ -87,5 +79,6 @@ pub fn grade(result: &RunResult) -> Verdict {
         agreement: Some(agreement),
         validity: Some(validity),
         termination: Some(termination),
+        protocol_conformance: Some(protocol_conformance),
     }
 }
